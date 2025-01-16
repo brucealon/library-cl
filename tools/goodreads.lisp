@@ -78,7 +78,7 @@
         ""
         (subseq fulltitle (+ pos 2)))))
 
-(defun goodread-series-title (book)
+(defun goodread-series-name (book)
   (goodread-title book 1))
 
 (defun goodread-series-number (book)
