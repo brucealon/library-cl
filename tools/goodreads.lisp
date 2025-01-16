@@ -107,9 +107,11 @@
                                    :user user-id))))
     (first (first creators))))
 
+;; NOTE: make sure the user is created in a new database before running this.
 (with-connection '("library_cl" "brking" "" "/var/run/postgresql/" :pooled-p t)
   (let ((user-id (user-id :email "bruce@minuteproductions.com"))
         (books (mapcar (lambda (csv) (apply 'new-goodread csv))
                        (rest (cl-csv:read-csv #P"/home/brking/Downloads/goodreads_library_export.csv")))))
     (loop for book being the elements of books do
+      (get-or-insert-creator book user-id)
       (get-or-insert-publication book user-id))))
