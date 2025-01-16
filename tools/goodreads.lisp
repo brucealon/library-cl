@@ -76,9 +76,6 @@
 (defun goodread-series-title (book)
   "") ;; DEBUG finish this
 
-(defparameter book nil)
-
-
 ;; look for creator
 ;;   add if not present
 ;; look for publication
@@ -92,28 +89,26 @@
   :binding :all-functions)
 
 (defun get-or-insert-publication (book user-id)
-  (let ((publication (or (publication-by-title :title (goodread-title book) :subtitle (goodread-subtitle book))
-                         (add-publication :title (goodread-title book)
-                                          :subtitle (goodread-subtitle book)
-                                          :private nil
-                                          :user user-id))))
-    (first (first publication))))
+  (let ((publications (or (publication-by-title :title (goodread-title book) :subtitle (goodread-subtitle book))
+                          (add-publication :title (goodread-title book)
+                                           :subtitle (goodread-subtitle book)
+                                           :private nil
+                                           :user user-id))))
+    (first (first publications))))
 
 (defun get-or-insert-creator (book user-id)
-  (let ((creator (or (creator-by-name :first (goodread-author-first book)
-                                      :middle (goodread-author-middle book)
-                                      :last (goodread-author-last book))
-                     (add-creator :first (goodread-author-first book)
-                                  :middle (goodread-author-middle book)
-                                  :last (goodread-author-last book)
-                                  :private nil
-                                  :user user-id))))
-    (first (first creator))))
-
-(goodread-grtitle book)
+  (let ((creators (or (creator-by-name :first (goodread-author-first book)
+                                       :middle (goodread-author-middle book)
+                                       :last (goodread-author-last book))
+                      (add-creator :first (goodread-author-first book)
+                                   :middle (goodread-author-middle book)
+                                   :last (goodread-author-last book)
+                                   :private nil
+                                   :user user-id))))
+    (first (first creators))))
 
 (with-connection '("library_cl" "brking" "" "/var/run/postgresql/" :pooled-p t)
-  (let ((user-id (first (first (library-user :email "bruce@minuteproductions.com"))))
+  (let ((user-id (user-id :email "bruce@minuteproductions.com"))
         (books (mapcar (lambda (csv) (apply 'new-goodread csv))
                        (rest (cl-csv:read-csv #P"/home/brking/Downloads/goodreads_library_export.csv")))))
     (loop for book being the elements of books do
