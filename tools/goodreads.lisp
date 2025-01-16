@@ -1,5 +1,6 @@
 
 (ql:quickload "cl-csv")
+(ql:quickload "cl-ppcre")
 
 (ql:quickload "cl-yesql")
 (ql:quickload "cl-yesql/postmodern")
@@ -58,13 +59,17 @@
 (defun goodread-author-last (book)
   (first (last (uiop:split-string (goodread-author book) :separator " "))))
 
-;; DEBUG need to remove series titles
-(defun goodread-title (book)
+(defun goodread-title (book &optional (part 0))
   (let* ((fulltitle (goodread-grtitle book))
-         (pos (search ": " fulltitle)))
-    (if (null pos)
-        fulltitle
-        (subseq fulltitle 0 pos))))
+         (pos (search ": " fulltitle))
+         (title (if (null pos)
+                    fulltitle
+                    (subseq fulltitle 0 pos))))
+    (multiple-value-bind (match groups)
+        (ppcre:scan-to-strings "^([^\\(]+) \\(([^,]+), #(\\d+)\\)" title)
+      (if (null match)
+          title
+          (aref groups part)))))
 
 (defun goodread-subtitle (book)
   (let* ((fulltitle (goodread-grtitle book))
@@ -74,7 +79,10 @@
         (subseq fulltitle (+ pos 2)))))
 
 (defun goodread-series-title (book)
-  "") ;; DEBUG finish this
+  (goodread-title book 1))
+
+(defun goodread-series-number (book)
+  (goodread-title book 2))
 
 ;; look for creator
 ;;   add if not present
@@ -107,6 +115,7 @@
                                    :user user-id))))
     (first (first creators))))
 
+;; (defparameter book nil) (setf book (nth 4 books)) will set the book to a series book (Ancillary Justice)
 ;; NOTE: make sure the user is created in a new database before running this.
 (with-connection '("library_cl" "brking" "" "/var/run/postgresql/" :pooled-p t)
   (let ((user-id (user-id :email "bruce@minuteproductions.com"))
