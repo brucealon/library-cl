@@ -7,82 +7,7 @@
 
 (use-package :postmodern)
 
-;;=> ("Book Id" "Title" "Author" "Author l-f" "Additional Authors" "ISBN"
-;;    "ISBN13" "My Rating" "Average Rating" "Publisher" "Binding"
-;;    "Number of Pages" "Year Published" "Original Publication Year" "Date Read"
-;;    "Date Added" "Bookshelves" "Bookshelves with positions" "Exclusive Shelf"
-;;    "My Review" "Spoiler" "Private Notes" "Read Count" "Owned Copies")
-(defstruct (goodread
-            (:constructor new-goodread
-                (id
-                 grtitle
-                 author author-lf add-authors
-                 isbn isbn13
-                 rating avg-rating
-                 publisher
-                 binding
-                 pages
-                 year-published org-pub-year
-                 date-read date-add
-                 shelves shelves-with-pos exclusive-shelf
-                 review
-                 spoiler
-                 notes
-                 read-count
-                 owned)))
-  id
-  grtitle
-  author author-lf add-authors
-  isbn isbn13
-  rating avg-rating
-  publisher
-  binding
-  pages
-  year-published org-pub-year
-  date-read date-add
-  shelves shelves-with-pos exclusive-shelf
-  review
-  spoiler
-  notes
-  read-count
-  owned)
-
-(defun goodread-author-first (book)
-  (first (uiop:split-string (goodread-author book) :separator " ")))
-
-(defun goodread-author-middle (book)
-  (let ((names (uiop:split-string (goodread-author book) :separator " ")))
-    (if (= 3 (length names))
-        (second names)
-        "")))
-
-(defun goodread-author-last (book)
-  (first (last (uiop:split-string (goodread-author book) :separator " "))))
-
-(defun goodread-title (book &optional (part 0))
-  (let* ((fulltitle (goodread-grtitle book))
-         (pos (search ": " fulltitle))
-         (title (if (null pos)
-                    fulltitle
-                    (subseq fulltitle 0 pos))))
-    (multiple-value-bind (match groups)
-        (ppcre:scan-to-strings "^([^\\(]+) \\(([^,]+), #(\\d+)\\)" title)
-      (if (null match)
-          title
-          (aref groups part)))))
-
-(defun goodread-subtitle (book)
-  (let* ((fulltitle (goodread-grtitle book))
-         (pos (search ": " fulltitle)))
-    (if (null pos)
-        ""
-        (subseq fulltitle (+ pos 2)))))
-
-(defun goodread-series-name (book)
-  (goodread-title book 1))
-
-(defun goodread-series-number (book)
-  (goodread-title book 2))
+(load "goodreads-models.lisp")
 
 ;; look for creator
 ;;   add if not present
@@ -97,30 +22,85 @@
   :binding :all-functions)
 
 (defun get-or-insert-publication (book user-id)
-  (let ((publications (or (publication-by-title :title (goodread-title book) :subtitle (goodread-subtitle book))
-                          (add-publication :title (goodread-title book)
-                                           :subtitle (goodread-subtitle book)
+  (let ((publications (or (publication-by-title :title (goodreads-title book) :subtitle (goodreads-subtitle book))
+                          (add-publication :title (goodreads-title book)
+                                           :subtitle (goodreads-subtitle book)
                                            :private nil
                                            :user user-id))))
     (first (first publications))))
 
 (defun get-or-insert-creator (book user-id)
-  (let ((creators (or (creator-by-name :first (goodread-author-first book)
-                                       :middle (goodread-author-middle book)
-                                       :last (goodread-author-last book))
-                      (add-creator :first (goodread-author-first book)
-                                   :middle (goodread-author-middle book)
-                                   :last (goodread-author-last book)
+  (let ((creators (or (creator-by-name :first (goodreads-author-first book)
+                                       :middle (goodreads-author-middle book)
+                                       :last (goodreads-author-last book))
+                      (add-creator :first (goodreads-author-first book)
+                                   :middle (goodreads-author-middle book)
+                                   :last (goodreads-author-last book)
                                    :private nil
                                    :user user-id))))
     (first (first creators))))
 
+(defun get-or-insert-series (book series-title user-id)
+  (let ((series (or (series-id-by-title :title series-title)
+                    (add-series :title series-title :private nil :user user-id))))
+    (first (first series))))
+
+(defun get-or-link-series-entry (publication-id series-id series-number user-id)
+  (let ((series-entries (or (series-entry :series series-id :publication publication-id)
+                            (add-series-entry :series series-id
+                                              :publication publication-id
+                                              :number series-number
+                                              :private nil
+                                              :user user-id))))
+    (first (first series-entries))))
+
+(defun link-series (book publication-id user-id)
+  (loop for series being the elements of (goodreads-series book) do
+    (let* ((series-title (first series))
+           (series-number (second series)))
+      (get-or-link-series-entry publication-id
+                                (get-or-insert-series book series-title user-id)
+                                series-number
+                                user-id))))
+
+(defun get-or-insert-edition (publication-id user-id)
+  (let ((editions (or (edition-by-publication :publication publication-id)
+                      (add-edition :publication publication-id
+                                   :private nil
+                                   :user user-id))))
+    (first (first editions))))
+
+(defun get-or-insert-edition-creator (edition-id creator-id user-id)
+  (let ((editions (or (edition-creator-by-id :edition edition-id)
+                      (add-edition-creator :edition edition-id
+                                           :creator creator-id
+                                           :private nil
+                                           :user user-id))))
+    (first (first editions))))
+
+(defun link-creator (creator-id publication-id user-id)
+  ;; publication_editions
+  ;; publication_edition_creators
+  (let ((edition-id (get-or-insert-edition publication-id user-id)))
+    (get-or-insert-edition-creator edition-id creator-id user-id)))
+
+(defparameter *postgres-user* "brking")
+(defparameter *postgres-pass* "")
+(defparameter *postgres-host* "/var/run/postgresql/")
+(defparameter *postgres-db* "library_cl")
+
+(defparameter *user-email* "bruce@minuteproductions.com")
+(defparameter *goodreads-export* #P"/home/brking/Downloads/goodreads_library_export.csv")
+
 ;; (defparameter book nil) (setf book (nth 4 books)) will set the book to a series book (Ancillary Justice)
+;; (defparameter book nil) (setf book (nth 5 books)) will set the book to a non-series book (American Fascists)
 ;; NOTE: make sure the user is created in a new database before running this.
-(with-connection '("library_cl" "brking" "" "/var/run/postgresql/" :pooled-p t)
-  (let ((user-id (user-id :email "bruce@minuteproductions.com"))
-        (books (mapcar (lambda (csv) (apply 'new-goodread csv))
-                       (rest (cl-csv:read-csv #P"/home/brking/Downloads/goodreads_library_export.csv")))))
+(with-connection (list *postgres-db* *postgres-user* *postgres-pass* *postgres-host* :pooled-p t)
+  (let ((user-id (user-id :email *user-email*))
+        (books (mapcar (lambda (csv) (apply 'new-goodreads csv))
+                       (rest (cl-csv:read-csv *goodreads-export*)))))
     (loop for book being the elements of books do
-      (get-or-insert-creator book user-id)
-      (get-or-insert-publication book user-id))))
+      (let ((creator-id (get-or-insert-creator book user-id))
+            (publication-id (get-or-insert-publication book user-id)))
+        (link-series book publication-id user-id)
+        (link-creator creator-id publication-id user-id)))))
