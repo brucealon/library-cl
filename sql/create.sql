@@ -100,7 +100,7 @@ CREATE TABLE publication_edition_creators (
        publication_edition_id bigint REFERENCES publication_editions(publication_edition_id),
        creator_id bigint REFERENCES creators(creator_id),
        role int REFERENCES creator_roles(creator_role_id),
-       private boolean;
+       private boolean,
        inserted_by bigint REFERENCES library_users(library_user_id),
        inserted_at timestamptz,
        updated_by bigint REFERENCES library_users(library_user_id),
