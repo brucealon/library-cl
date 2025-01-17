@@ -9,13 +9,6 @@
 
 (load "goodreads-models.lisp")
 
-;; look for creator
-;;   add if not present
-;; look for publication
-;;   add if not present
-;; link publication to publication edition
-;; link publication edition to creator
-
 (yesql:import my-queries
   :from "/home/brking/Repos/library-cl/sql/queries.sql"
   :as :cl-yesql/postmodern
@@ -92,8 +85,6 @@
 (defparameter *user-email* "bruce@minuteproductions.com")
 (defparameter *goodreads-export* #P"/home/brking/Downloads/goodreads_library_export.csv")
 
-;; (defparameter book nil) (setf book (nth 4 books)) will set the book to a series book (Ancillary Justice)
-;; (defparameter book nil) (setf book (nth 5 books)) will set the book to a non-series book (American Fascists)
 ;; NOTE: make sure the user is created in a new database before running this.
 (with-connection (list *postgres-db* *postgres-user* *postgres-pass* *postgres-host* :pooled-p t)
   (let ((user-id (user-id :email *user-email*))
