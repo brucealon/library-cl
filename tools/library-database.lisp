@@ -11,7 +11,11 @@
 
 (defun get-or-insert-user (email first-name last-name display-name admin)
   (let ((users (or (user-id :email email)
-                     (add-user :first first-name :last last-name :display display-name :admin admin))))
+                   (add-user :email email
+                             :first first-name
+                             :last last-name
+                             :display display-name
+                             :admin admin))))
     (first (first users))))
 
 (defun get-or-insert-publication (book user-id)
