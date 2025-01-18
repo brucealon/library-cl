@@ -1,8 +1,13 @@
 
--- name: user-id @single
+-- name: user-id
 select library_user_id
   from library_users
   where email = :email
+
+-- name: add-user
+insert into library_users (email, first_name, last_name, display_name, joined, admin)
+  values (:email, :first, :last, :display, now(), :admin)
+  returning library_user_id
 
 -- name: publication-by-title
 select publication_id,
