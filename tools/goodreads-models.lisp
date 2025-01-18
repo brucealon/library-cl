@@ -1,4 +1,6 @@
 
+(ql:quickload "cl-ppcre")
+
 ;; Data structure for reading in the Goodreads exported CSV.
 ;; I want to be able to just give a row list and get back a
 ;; structure, without all the additional keywords.
@@ -99,3 +101,7 @@
       (if match
           (parse-series (aref groups 0))
           nil))))
+
+(defun read-goodreads-csv (csv-file)
+  (mapcar (lambda (csv) (apply 'new-goodreads csv))
+                       (rest (cl-csv:read-csv csv-file))))
