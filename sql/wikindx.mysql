@@ -36,9 +36,20 @@ select r.resourceId as id,
        coalesce(t.resourcetextUrls, '') as url,
        m.resourcemiscField2 as pub_day,
        m.resourcemiscField3 as pub_month,
-       m.resourcemiscField4 as volumes
+       m.resourcemiscField4 as volumes,
+       rq.resourcequotePageStart as quote_start,
+       rq.resourcequotePageEnd as quote_end,
+       rqt.resourcequotetextText as quote,
+       rqc.resourcequotecommentComment as quote_comment
   from WKX_resource r
     inner join WKX_resource_misc m on r.resourceId = m.resourcemiscId
-    left outer join WKX_resource_creator rc on r.resourcecreatorResourceId = rc.resourceId
+    left outer join WKX_resource_creator rc on rc.resourcecreatorResourceId = r.resourceId
     left outer join WKX_creator c on rc.resourcecreatorCreatorId = c.creatorId
     left outer join WKX_resource_text t on r.resourceID = t.resourcetextId
+    left outer join WKX_resource_quote rq on rq.resourcequoteResourceId = r.resourceId
+    left outer join WKX_resource_quote_comment rqc on rqc.resourcequotecommentQuoteId = rq.resourcequoteId
+    left outer join WKX_resource_quote_text rqt on rqt.resourcequotetextId = rq.resourcequoteId
+
+show tables;
+
+describe WKX_resource_quote_comment
