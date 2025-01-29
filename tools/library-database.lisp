@@ -5,7 +5,7 @@
 (use-package :postmodern)
 
 (yesql:import my-queries
-  :from "/home/brking/Repos/library-cl/sql/queries.sql"
+  :from "/home/brking/Repos/library-cl/sql/queries.pgsql"
   :as :cl-yesql/postmodern
   :binding :all-functions)
 
