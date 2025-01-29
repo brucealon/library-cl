@@ -19,27 +19,33 @@
     (first (first users))))
 
 (defun get-or-insert-publication (book user-id)
-  (let ((publications (or (publication-by-title :title (goodreads-title book) :subtitle (goodreads-subtitle book))
-                          (add-publication :title (goodreads-title book)
-                                           :subtitle (goodreads-subtitle book)
-                                           :private nil
-                                           :user user-id))))
+  (let ((publications (or (publication-by-title :title (book-title book) :subtitle (book-subtitle book))
+                          (progn
+                            (format t "Adding book ~a to database.~%" (book-title book))
+                            (add-publication :title (book-title book)
+                                             :subtitle (book-subtitle book)
+                                             :private nil
+                                             :user user-id)))))
     (first (first publications))))
 
 (defun get-or-insert-creator (book user-id)
-  (let ((creators (or (creator-by-name :first (goodreads-author-first book)
-                                       :middle (goodreads-author-middle book)
-                                       :last (goodreads-author-last book))
-                      (add-creator :first (goodreads-author-first book)
-                                   :middle (goodreads-author-middle book)
-                                   :last (goodreads-author-last book)
-                                   :private nil
-                                   :user user-id))))
+  (let ((creators (or (creator-by-name :first (book-author-first book)
+                                       :middle (book-author-middle book)
+                                       :last (book-author-last book))
+                      (progn
+                        (format t "Adding creator ~a to database.~%" (book-author-first book))
+                        (add-creator :first (book-author-first book)
+                                     :middle (book-author-middle book)
+                                     :last (book-author-last book)
+                                     :private nil
+                                     :user user-id)))))
     (first (first creators))))
 
 (defun get-or-insert-series (book series-title user-id)
   (let ((series (or (series-id-by-title :title series-title)
-                    (add-series :title series-title :private nil :user user-id))))
+                    (progn
+                      (format t "Adding series ~a to database.~%" series-title)
+                      (add-series :title series-title :private nil :user user-id)))))
     (first (first series))))
 
 (defun get-or-link-series-entry (publication-id series-id series-number user-id)
@@ -52,7 +58,7 @@
     (first (first series-entries))))
 
 (defun link-series (book publication-id user-id)
-  (loop for series being the elements of (goodreads-series book) do
+  (loop for series being the elements of (book-series book) do
     (let* ((series-title (first series))
            (series-number (second series)))
       (get-or-link-series-entry publication-id
