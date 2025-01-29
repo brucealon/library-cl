@@ -57,7 +57,9 @@
   (nth 14 (slot-value goodreads-book 'data)))
 
 (defmethod book-isbn (goodreads-book)
-  (nth 5 (slot-value goodreads-book 'data)))
+  (let* ((isbn (nth 6 (slot-value goodreads-book 'data)))
+         (match (ppcre:all-matches "([0-9-]+)" isbn)))
+    (and match (subseq isbn (car match) (cadr match)))))
 
 (defmethod book-pages (goodreads-book)
   (nth 11 (slot-value goodreads-book 'data)))
@@ -70,7 +72,7 @@
          (intcount (cond ((typep count 'integer) count)
                          ((typep count 'string) (parse-integer count))
                          (t 0))))
-     (> intcount 0)))
+    (> intcount 0)))
 
 (defmethod book-series (goodreads-book)
   (let* ((fulltitle (nth 1 (slot-value goodreads-book 'data))))
