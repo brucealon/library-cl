@@ -15,6 +15,8 @@
 
 (defgeneric book-read (book))
 
+(defgeneric book-role (book))
+
 (defgeneric book-series (book))
 
 (defgeneric book-subtitle (book))

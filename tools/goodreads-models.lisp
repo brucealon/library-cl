@@ -62,7 +62,10 @@
     (and match (subseq isbn (car match) (cadr match)))))
 
 (defmethod book-pages (goodreads-book)
-  (nth 11 (slot-value goodreads-book 'data)))
+  (let ((pages (nth 11 (slot-value goodreads-book 'data))))
+    (if (typep pages 'integer)
+        pages
+        0)))
 
 (defmethod book-rating (goodreads-book)
   (nth 7 (slot-value goodreads-book 'data)))
@@ -73,6 +76,9 @@
                          ((typep count 'string) (parse-integer count))
                          (t 0))))
     (> intcount 0)))
+
+(defmethod book-role (goodreads-book)
+  "Author")
 
 (defmethod book-series (goodreads-book)
   (let* ((fulltitle (nth 1 (slot-value goodreads-book 'data))))

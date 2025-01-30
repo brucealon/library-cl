@@ -38,6 +38,16 @@ insert into creators (first_name, middle_name, last_name, private, inserted_by, 
   values (:first, :middle, :last, :private, :user, now())
   returning creator_id
 
+-- name: creator-role-by-name
+select cr.creator_role_id
+  from creator_roles as cr
+  where cr.name = :name
+
+-- name: add-creator-role
+insert into creator_roles (name, inserted_by, inserted_at)
+  values (:name, :user, now())
+  returning creator_role_id
+
 -- name: series-id-by-title
 select publication_series_id
    from publication_series
@@ -78,8 +88,8 @@ select publication_edition_id
   where publication_id = :publication
 
 -- name: add-edition
-insert into publication_editions (publication_id, private, inserted_by, inserted_at)
-  values (:publication, :private, :user, now())
+insert into publication_editions (publication_id, pages, isbn, private, inserted_by, inserted_at)
+  values (:publication, :pages, :isbn, :private, :user, now())
   returning publication_edition_id
 
 -- name: edition-creator-by-id
@@ -88,6 +98,29 @@ select publication_edition_creator_id
   where publication_edition_id = :edition
 
 -- name: add-edition-creator
-insert into publication_edition_creators (publication_edition_id, creator_id, private, inserted_by, inserted_at)
-  values (:edition, :creator, :private, :user, now())
+insert into publication_edition_creators (publication_edition_id, creator_id, creator_role_id, private, inserted_by, inserted_at)
+  values (:edition, :creator, :role, :private, :user, now())
   returning publication_edition_creator_id
+
+-- name: user-publication-edition-read
+select user_publication_edition_read_id
+  from user_publication_edition_reads
+  where publication_edition_id = :edition
+    and user_id = :user
+
+-- name: add-user-publication-edition-read
+insert into user_publication_edition_reads (publication_edition_id, user_id, read, finished, private, inserted_at)
+  values (:edition, :user, :read, :finished, :private, now())
+  returning user_publication_edition_read_id
+
+-- name: user-publication-review
+select user_publication_review_id,
+       stars,
+       review
+  from user_publication_reviews
+  where user_publication_edition_read_id = :read
+
+-- name: add-user-publication-review
+insert into user_publication_reviews (user_publication_edition_read_id, stars, review, private, inserted_at)
+  values (:read, :rating, :review, :private, now())
+  returning user_publication_review_id
