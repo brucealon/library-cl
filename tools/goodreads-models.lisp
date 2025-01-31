@@ -81,12 +81,24 @@
   "Author")
 
 (defmethod book-series (goodreads-book)
-  (let* ((fulltitle (nth 1 (slot-value goodreads-book 'data))))
-    (multiple-value-bind (match groups)
-        (ppcre:scan-to-strings "\\((.*)\\)" fulltitle)
-      (if match
-          (parse-series (aref groups 0))
-          nil))))
+  (flet ((parse-one-series (series)
+           (multiple-value-bind (match groups)
+               (ppcre:scan-to-strings "^([^,]+),? +#([\\d\.-]+)" series)
+             (if match
+                 (list (aref groups 0) (aref groups 1))
+                 nil)))
+         (parse-series (series)
+           (if (null (search ";" series))
+               (if (null (search "#" series))
+                   (list (list series))
+                   (list (parse-one-series series)))
+               (mapcar (lambda (s) (parse-one-series s)) (ppcre:split "; " series)))))
+    (let* ((fulltitle (nth 1 (slot-value goodreads-book 'data))))
+      (multiple-value-bind (match groups)
+          (ppcre:scan-to-strings "\\((.*)\\)" fulltitle)
+        (if match
+            (parse-series (aref groups 0))
+            nil)))))
 
 (defmethod book-subtitle (goodreads-book)
   (let* ((fulltitle (nth 1 (slot-value goodreads-book 'data)))
@@ -106,17 +118,3 @@
       (if match
           (aref groups 0)
           title))))
-
-(defun parse-one-series (series)
-  (multiple-value-bind (match groups)
-      (ppcre:scan-to-strings "^([^,]+),? +#([\\d\.-]+)" series)
-    (if match
-        (list (aref groups 0) (aref groups 1))
-        nil)))
-
-(defun parse-series (series)
-  (if (null (search ";" series))
-      (if (null (search "#" series))
-          (list (list series))
-          (list (parse-one-series series)))
-      (mapcar (lambda (s) (parse-one-series s)) (ppcre:split "; " series))))

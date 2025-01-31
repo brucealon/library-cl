@@ -11,10 +11,10 @@
     ("Sabriel (Abhorsen,  #1)"                                   "Sabriel"            (("Abhorsen" "1")))))
 
 (defun new-goodreads-test (title)
-  (new-goodreads nil
-                 title
-                 nil nil nil nil nil nil nil nil nil nil nil
-                 nil nil nil nil nil nil nil nil nil nil nil))
+  (new-goodreads `(nil
+                   ,title
+                   nil nil nil nil nil nil nil nil nil nil nil
+                   nil nil nil nil nil nil nil nil nil nil nil)))
 
 (let ((title-failures 0)
       (series-failures 0))
@@ -24,13 +24,13 @@
            (title (nth 1 title-test))
            (series (nth 2 title-test))
            (book (new-goodreads-test grtitle)))
-      (if (not (equal title (goodreads-title book)))
+      (if (not (equal title (book-title book)))
           (progn
-            (format t "~a does not match ~a~%" (goodreads-title book) title)
+            (format t "~a does not match ~a~%" (book-title book) title)
             (setf title-failures (1+ title-failures))))
-      (if (not (equal series (goodreads-series book)))
+      (if (not (equal series (book-series book)))
           (progn
-            (format t "~a does not match ~a~%" (goodreads-series book) series)
+            (format t "~a does not match ~a~%" (book-series book) series)
             (setf series-failures (1+ series-failures))))))
   (format t "~a failures.~%" title-failures)
   (format t "~a series failures.~%~%" series-failures))
