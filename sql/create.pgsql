@@ -117,7 +117,9 @@ CREATE TABLE user_quotes (
        chapter text,
        section text,
        private boolean,
+       inserted_by bigint REFERENCES library_users(library_user_id),
        inserted_at timestamptz,
+       updated_by bigint REFERENCES library_users(library_user_id),
        updated_at timestamptz
 );
 
@@ -126,7 +128,9 @@ CREATE TABLE user_creator_comments (
        creator_id bigint REFERENCES creators(creator_id),
        comment text,
        private boolean,
+       inserted_by bigint REFERENCES library_users(library_user_id),
        inserted_at timestamptz,
+       updated_by bigint REFERENCES library_users(library_user_id),
        updated_at timestamptz
 );
 
@@ -139,7 +143,9 @@ CREATE TABLE user_publication_editions (
        purchased date,
        source text,
        private boolean,
+       inserted_by bigint REFERENCES library_users(library_user_id),
        inserted_at timestamptz,
+       updated_by bigint REFERENCES library_users(library_user_id),
        updated_at timestamptz
 );
 
@@ -152,7 +158,9 @@ CREATE TABLE user_publication_edition_reads (
        finished boolean,
        last_page_read text,
        private boolean,
+       inserted_by bigint REFERENCES library_users(library_user_id),
        inserted_at timestamptz,
+       updated_by bigint REFERENCES library_users(library_user_id),
        updated_at timestamptz
 );
 
@@ -162,7 +170,9 @@ CREATE TABLE user_publication_series_comments (
        user_id bigint REFERENCES library_users(library_user_id),
        comment text,
        private boolean,
+       inserted_by bigint REFERENCES library_users(library_user_id),
        inserted_at timestamptz,
+       updated_by bigint REFERENCES library_users(library_user_id),
        updated_at timestamptz
 );
 
@@ -172,7 +182,9 @@ CREATE TABLE user_publication_comments (
        user_id bigint REFERENCES library_users(library_user_id),
        comment text,
        private boolean,
+       inserted_by bigint REFERENCES library_users(library_user_id),
        inserted_at timestamptz,
+       updated_by bigint REFERENCES library_users(library_user_id),
        updated_at timestamptz
 );
 
@@ -182,7 +194,9 @@ CREATE TABLE user_publication_reviews (
        stars int,
        review text,
        private boolean,
+       inserted_by bigint REFERENCES library_users(library_user_id),
        inserted_at timestamptz,
+       updated_by bigint REFERENCES library_users(library_user_id),
        updated_at timestamptz
 );
 
@@ -191,7 +205,9 @@ CREATE TABLE user_quote_comments (
        user_quote_id bigint REFERENCES user_quotes(user_quote_id),
        comment text,
        private boolean,
+       inserted_by bigint REFERENCES library_users(library_user_id),
        inserted_at timestamptz,
+       updated_by bigint REFERENCES library_users(library_user_id),
        updated_at timestamptz
 );
 

@@ -109,8 +109,8 @@ select user_publication_edition_read_id
     and user_id = :user
 
 -- name: add-user-publication-edition-read
-insert into user_publication_edition_reads (publication_edition_id, user_id, read, finished, private, inserted_at)
-  values (:edition, :user, :read, :finished, :private, now())
+insert into user_publication_edition_reads (publication_edition_id, user_id, read, finished, private, inserted_by, inserted_at)
+  values (:edition, :user, :read, :finished, :private, :user, now())
   returning user_publication_edition_read_id
 
 -- name: user-publication-review
@@ -121,8 +121,8 @@ select user_publication_review_id,
   where user_publication_edition_read_id = :read
 
 -- name: add-user-publication-review
-insert into user_publication_reviews (user_publication_edition_read_id, stars, review, private, inserted_at)
-  values (:read, :rating, :review, :private, now())
+insert into user_publication_reviews (user_publication_edition_read_id, stars, review, private, inserted_by, inserted_at)
+  values (:read, :rating, :review, :private, :user, now())
   returning user_publication_review_id
 
 -- name: publication-edition-quote
@@ -133,6 +133,6 @@ select user_quote_id
     and page = :page
 
 -- name: add-publication-edition-quote
-insert into user_quotes (publication_edition_id, quote, page, user_id, private, inserted_at)
-  values (:edition, :quote, :page, :user, :private, now())
+insert into user_quotes (publication_edition_id, quote, page, user_id, private, inserted_by, inserted_at)
+  values (:edition, :quote, :page, :user, :private, :user, now())
   returning user_quote_id

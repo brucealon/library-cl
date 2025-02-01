@@ -106,7 +106,8 @@
                      (add-user-publication-review :read user-edition-read-id
                                                   :rating (book-rating book)
                                                   :review ""
-                                                  :private nil))))
+                                                  :private nil
+                                                  :user user-id))))
     (first (first reviews))))
 
 (defun get-or-insert-quote (book edition-id user-id)
