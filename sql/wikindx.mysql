@@ -22,12 +22,10 @@ select c.creatorId as id,
 
 -- resources
 select r.resourceId as id,
-       m.resourcemiscPublisher as publisher,
        m.resourcemiscCollection as collection,
        r.resourceType as resource_type,
        r.resourceTitle as title,
        r.resourceSubtitle as subtitle,
-       r.resourceShortTitle as shorttitle,
        r.resourceField1 as seriestitle,
        r.resourceField2 as edition,
        r.resourceField4 as volumenumber,
@@ -49,6 +47,21 @@ select r.resourceId as id,
     left outer join WKX_resource_quote rq on rq.resourcequoteResourceId = r.resourceId
     left outer join WKX_resource_quote_comment rqc on rqc.resourcequotecommentQuoteId = rq.resourcequoteId
     left outer join WKX_resource_quote_text rqt on rqt.resourcequotetextId = rq.resourcequoteId
+  where r.resourceTitle = 'Blood of Elves';
+
+select r.resourceTitle as title,
+       m.resourcemiscCollection as collection,
+       r.resourceField1 as seriestitle,
+       r.resourceField3 as seriesnumber
+  from WKX_resource r
+    inner join WKX_resource_misc m on r.resourceId = m.resourcemiscId
+    left outer join WKX_resource_creator rc on rc.resourcecreatorResourceId = r.resourceId
+    left outer join WKX_creator c on rc.resourcecreatorCreatorId = c.creatorId
+    left outer join WKX_resource_text t on r.resourceID = t.resourcetextId
+    left outer join WKX_resource_quote rq on rq.resourcequoteResourceId = r.resourceId
+    left outer join WKX_resource_quote_comment rqc on rqc.resourcequotecommentQuoteId = rq.resourcequoteId
+    left outer join WKX_resource_quote_text rqt on rqt.resourcequotetextId = rq.resourcequoteId
+  where r.resourceField3 is not null
 
 show tables;
 

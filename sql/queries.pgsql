@@ -124,3 +124,15 @@ select user_publication_review_id,
 insert into user_publication_reviews (user_publication_edition_read_id, stars, review, private, inserted_at)
   values (:read, :rating, :review, :private, now())
   returning user_publication_review_id
+
+-- name: publication-edition-quote
+select user_quote_id
+  from user_quotes
+  where publication_edition_id = :edition
+    and user_id = :user
+    and page = :page
+
+-- name: add-publication-edition-quote
+insert into user_quotes (publication_edition_id, quote, page, user_id, private, inserted_at)
+  values (:edition, :quote, :page, :user, :private, now())
+  returning user_quote_id

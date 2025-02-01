@@ -1,5 +1,4 @@
 
-(ql:quickload "cl-csv")
 (ql:quickload "cl-ppcre")
 
 (load "library-models.lisp")
@@ -37,21 +36,20 @@
     (setf (slot-value instance 'data) csv-row)
     instance))
 
-(defun read-goodreads-csv (csv-file)
-  (mapcar (lambda (csv) (funcall 'new-goodreads csv))
-                       (rest (cl-csv:read-csv csv-file))))
-
-(defmethod book-author-first (goodreads-book)
+(defmethod book-creator-first (goodreads-book)
   (first (uiop:split-string (nth 2 (slot-value goodreads-book 'data)) :separator " ")))
 
-(defmethod book-author-last (goodreads-book)
+(defmethod book-creator-last (goodreads-book)
   (first (last (uiop:split-string (nth 2 (slot-value goodreads-book 'data)) :separator " "))))
 
-(defmethod book-author-middle (goodreads-book)
+(defmethod book-creator-middle (goodreads-book)
   (let ((names (uiop:split-string (nth 2 (slot-value goodreads-book 'data)) :separator " ")))
     (if (= 3 (length names))
         (second names)
         "")))
+
+(defmethod book-creator-role (goodreads-book)
+  "Author")
 
 (defmethod book-date-read (goodreads-book)
   (nth 14 (slot-value goodreads-book 'data)))
@@ -67,6 +65,18 @@
         pages
         0)))
 
+(defmethod book-quote-comment (goodreads-book)
+  nil)
+
+(defmethod book-quote-end (goodreads-book)
+  nil)
+
+(defmethod book-quote-start (goodreads-book)
+  nil)
+
+(defmethod book-quote-text (goodreads-book)
+  nil)
+
 (defmethod book-rating (goodreads-book)
   (nth 7 (slot-value goodreads-book 'data)))
 
@@ -77,22 +87,19 @@
                          (t 0))))
     (> intcount 0)))
 
-(defmethod book-role (goodreads-book)
-  "Author")
-
 (defmethod book-series (goodreads-book)
-  (flet ((parse-one-series (series)
-           (multiple-value-bind (match groups)
-               (ppcre:scan-to-strings "^([^,]+),? +#([\\d\.-]+)" series)
-             (if match
-                 (list (aref groups 0) (aref groups 1))
-                 nil)))
-         (parse-series (series)
-           (if (null (search ";" series))
-               (if (null (search "#" series))
-                   (list (list series))
-                   (list (parse-one-series series)))
-               (mapcar (lambda (s) (parse-one-series s)) (ppcre:split "; " series)))))
+  (labels ((parse-one-series (series)
+             (multiple-value-bind (match groups)
+                 (ppcre:scan-to-strings "^([^,]+),? +#([\\d\.-]+)" series)
+               (if match
+                   (list (aref groups 0) (aref groups 1))
+                   nil)))
+           (parse-series (series)
+             (if (null (search ";" series))
+                 (if (null (search "#" series))
+                     (list (list series))
+                     (list (parse-one-series series)))
+                 (mapcar (lambda (s) (parse-one-series s)) (ppcre:split "; " series)))))
     (let* ((fulltitle (nth 1 (slot-value goodreads-book 'data))))
       (multiple-value-bind (match groups)
           (ppcre:scan-to-strings "\\((.*)\\)" fulltitle)
