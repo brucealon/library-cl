@@ -136,3 +136,13 @@ select user_quote_id
 insert into user_quotes (publication_edition_id, quote, page, user_id, private, inserted_by, inserted_at)
   values (:edition, :quote, :page, :user, :private, :user, now())
   returning user_quote_id
+
+-- name: user-quote-comment
+select user_quote_comment_id
+  from user_quote_comments
+  where user_quote_id = :quote
+
+-- name: add-user-quote-comment
+insert into user_quote_comments (user_quote_id, comment, private, inserted_by, inserted_at)
+  values (:quote, :comment, :private, :user, now())
+  returning user_quote_comment_id

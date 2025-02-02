@@ -111,15 +111,25 @@
     (first (first reviews))))
 
 (defun get-or-insert-quote (book edition-id user-id)
-  (let* ((quotes (or (publication-edition-quote :edition edition-id :user user-id :page (book-quote-start book))
-                     (progn
-                       (format t "Inserting quote for ~a on page ~a~%" (book-title book) (book-quote-start book))
-                       (add-publication-edition-quote :edition edition-id
-                                                      :quote (book-quote-text book)
-                                                      :page (book-quote-start book)
-                                                      :user user-id
-                                                      :private nil)))))
+  (let ((quotes (or (publication-edition-quote :edition edition-id :user user-id :page (book-quote-start book))
+                    (progn
+                      (format t "Inserting quote for ~a on page ~a~%" (book-title book) (book-quote-start book))
+                      (add-publication-edition-quote :edition edition-id
+                                                     :quote (book-quote-text book)
+                                                     :page (book-quote-start book)
+                                                     :user user-id
+                                                     :private nil)))))
     (first (first quotes))))
+
+(defun get-or-insert-quote-comment (book quote-id user-id)
+  (let ((comments (or (user-quote-comment :quote quote-id)
+                      (progn
+                        (format t "Inserting comment for quote ~a~%" quote-id)
+                        (add-user-quote-comment :quote quote-id
+                                                :user user-id
+                                                :comment (book-quote-comment book)
+                                                :private nil)))))
+    (first (first comments))))
 
 (defun import-book (book user-id)
   (let* ((creator-id (get-or-insert-creator book user-id))
@@ -130,8 +140,12 @@
     (and (> (length (book-date-read book)) 0)
          (let ((read-id (get-or-insert-read book edition-id user-id)))
            (get-or-insert-review book read-id user-id)))
-    (and (book-quote-text book)
-         (get-or-insert-quote book edition-id user-id))))
+    (if (book-quote-text book)
+        (let ((quote-id (get-or-insert-quote book edition-id user-id)))
+          (if (book-quote-comment book)
+              (progn
+                (format t "Quote Comment ~a~%" (book-quote-comment book))
+                (get-or-insert-quote-comment book quote-id user-id)))))))
 
 (defun import-books (books)
   (with-connection (list *postgres-db* *postgres-user* *postgres-pass* *postgres-host* :pooled-p t)
