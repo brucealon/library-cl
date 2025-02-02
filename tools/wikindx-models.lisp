@@ -47,7 +47,6 @@
   (nth 16 (slot-value wikindx-book 'data)))
 
 (defmethod book-quote-text (wikindx-book)
-  (format t "Quote: ~a~%" (nth 18 (slot-value wikindx-book 'data))) ;; DEBUG
   (nth 18 (slot-value wikindx-book 'data)))
 
 (defmethod book-rating (wikindx-book)
