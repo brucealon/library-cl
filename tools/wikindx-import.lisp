@@ -42,5 +42,3 @@
   (let* ((result-set (cl-mysql:query *wikindx-query*))
          (books (first (first result-set))))
     (mapcar (lambda (row) (funcall 'new-wikindx row)) books)))
-
-(import-books (read-wikindx-db))

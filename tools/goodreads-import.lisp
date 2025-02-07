@@ -8,5 +8,3 @@
 (defun read-goodreads-csv (csv-file)
   (mapcar (lambda (csv) (funcall 'new-goodreads csv))
                        (rest (cl-csv:read-csv csv-file))))
-
-(import-books (read-goodreads-csv *goodreads-export*))
