@@ -1,5 +1,6 @@
 
-(load "library-models.lisp")
+(load (merge-pathnames ".library-config.lisp" (user-homedir-pathname)))
+(load (merge-pathnames "tools/library-models.lisp" *project-dir*))
 
 (defclass wikindx-book ()
   (data))

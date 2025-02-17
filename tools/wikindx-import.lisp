@@ -1,8 +1,8 @@
 
 (ql:quickload "cl-mysql")
-(load "/home/brking/.library-config.lisp")
-(load "wikindx-models.lisp")
-(load "library-database.lisp")
+(load (merge-pathnames ".library-config.lisp" (user-homedir-pathname)))
+(load (merge-pathnames "tools/wikindx-models.lisp" *project-dir*))
+(load (merge-pathnames "tools/library-database.lisp" *project-dir*))
 
 (defparameter *wikindx-query*
   "select r.resourceId as id,

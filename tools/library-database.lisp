@@ -1,11 +1,14 @@
 
+(load (merge-pathnames ".library-config.lisp" (user-homedir-pathname)))
+
 (ql:quickload "cl-yesql")
 (ql:quickload "cl-yesql/postmodern")
 
 (use-package :postmodern)
 
+(overlord:set-package-base *project-dir*)
 (yesql:import my-queries
-  :from "/home/brking/Repos/library-cl/sql/queries.pgsql"
+  :from "sql/queries.pgsql"
   :as :cl-yesql/postmodern
   :binding :all-functions)
 
