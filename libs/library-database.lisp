@@ -26,6 +26,9 @@
 (defun all-publications ()
   (publications))
 
+(defun all-creators ()
+  (creators))
+
 (defun get-or-insert-publication (book user-id inserter-id)
   (let ((publications (or (publication-by-title :title (book-title book) :subtitle (book-subtitle book))
                           (progn

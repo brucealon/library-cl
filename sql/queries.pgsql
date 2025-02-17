@@ -15,6 +15,12 @@ select publication_id,
        subtitle
   from publications
 
+-- name: creators
+select creator_id,
+       first_name,
+       last_name
+  from creators
+
 -- name: publication-by-title
 select publication_id,
        title,
