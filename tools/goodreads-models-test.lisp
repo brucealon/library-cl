@@ -1,5 +1,6 @@
 
-(load "goodreads-models.lisp")
+(load (merge-pathnames ".library-config.lisp" (user-homedir-pathname)))
+(load (merge-pathnames "tools/goodreads-models.lisp" *project-dir*))
 
 (defparameter *title-tests*
   '(("Ancillary Justice (Imperial Radch, #1)"                    "Ancillary Justice"  (("Imperial Radch" "1")))
