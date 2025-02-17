@@ -2,7 +2,7 @@
 (ql:quickload "cl-ppcre")
 
 (load (merge-pathnames ".library-config.lisp" (user-homedir-pathname)))
-(load (merge-pathnames "tools/library-models.lisp" *project-dir*))
+(load (merge-pathnames "libs/library-models.lisp" *project-dir*))
 
 ;; 00 "Book Id"
 ;; 01 "Title"
