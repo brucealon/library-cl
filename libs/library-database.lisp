@@ -23,6 +23,9 @@
                                :admin admin)))))
     (first (first users))))
 
+(defun all-publications ()
+  (publications))
+
 (defun get-or-insert-publication (book user-id inserter-id)
   (let ((publications (or (publication-by-title :title (book-title book) :subtitle (book-subtitle book))
                           (progn
@@ -140,6 +143,7 @@
     (first (first comments))))
 
 (defun import-book (book user-id inserter-id)
+  (format t "Processing ~a~%" (book-title book))
   (let* ((creator-id (get-or-insert-creator book user-id inserter-id))
          (publication-id (get-or-insert-publication book user-id inserter-id))
          (edition-id (get-or-insert-edition book publication-id user-id inserter-id)))
@@ -156,7 +160,7 @@
                 (get-or-insert-quote-comment book quote-id user-id inserter-id)))))))
 
 (defun import-books (books)
-  (with-connection (list *postgres-db* *postgres-user* *postgres-pass* *postgres-host* :pooled-p t)
+  (with-connection (list *postgres-db* *postgres-user* *postgres-pass* *postgres-host*)
     (let ((user-id (get-or-insert-user *user-email* *user-first* *user-last* *user-display* *user-admin*))
           (inserter-id (get-or-insert-user *inserter-email* *inserter-first* *inserter-last* *inserter-display* *inserter-admin*)))
       (loop for book being the elements of books do

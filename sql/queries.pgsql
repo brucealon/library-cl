@@ -9,6 +9,12 @@ insert into library_users (email, first_name, last_name, display_name, joined, a
   values (:email, :first, :last, :display, now(), :admin)
   returning library_user_id
 
+-- name: publications
+select publication_id,
+       title,
+       subtitle
+  from publications
+
 -- name: publication-by-title
 select publication_id,
        title,

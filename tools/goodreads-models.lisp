@@ -37,58 +37,58 @@
     (setf (slot-value instance 'data) csv-row)
     instance))
 
-(defmethod book-creator-first (goodreads-book)
-  (first (uiop:split-string (nth 2 (slot-value goodreads-book 'data)) :separator " ")))
+(defmethod book-creator-first ((book goodreads-book))
+  (first (uiop:split-string (nth 2 (slot-value book 'data)) :separator " ")))
 
-(defmethod book-creator-last (goodreads-book)
-  (first (last (uiop:split-string (nth 2 (slot-value goodreads-book 'data)) :separator " "))))
+(defmethod book-creator-last ((book goodreads-book))
+  (first (last (uiop:split-string (nth 2 (slot-value book 'data)) :separator " "))))
 
-(defmethod book-creator-middle (goodreads-book)
-  (let ((names (uiop:split-string (nth 2 (slot-value goodreads-book 'data)) :separator " ")))
+(defmethod book-creator-middle ((book goodreads-book))
+  (let ((names (uiop:split-string (nth 2 (slot-value book 'data)) :separator " ")))
     (if (= 3 (length names))
         (second names)
         "")))
 
-(defmethod book-creator-role (goodreads-book)
+(defmethod book-creator-role ((book goodreads-book))
   "Author")
 
-(defmethod book-date-read (goodreads-book)
-  (nth 14 (slot-value goodreads-book 'data)))
+(defmethod book-date-read ((book goodreads-book))
+  (nth 14 (slot-value book 'data)))
 
-(defmethod book-isbn (goodreads-book)
-  (let* ((isbn (nth 6 (slot-value goodreads-book 'data)))
+(defmethod book-isbn ((book goodreads-book))
+  (let* ((isbn (nth 6 (slot-value book 'data)))
          (match (ppcre:all-matches "([0-9-]+)" isbn)))
     (and match (subseq isbn (car match) (cadr match)))))
 
-(defmethod book-pages (goodreads-book)
-  (let ((pages (nth 11 (slot-value goodreads-book 'data))))
+(defmethod book-pages ((book goodreads-book))
+  (let ((pages (nth 11 (slot-value book 'data))))
     (if (typep pages 'integer)
         pages
         0)))
 
-(defmethod book-quote-comment (goodreads-book)
+(defmethod book-quote-comment ((book goodreads-book))
   nil)
 
-(defmethod book-quote-end (goodreads-book)
+(defmethod book-quote-end ((book goodreads-book))
   nil)
 
-(defmethod book-quote-start (goodreads-book)
+(defmethod book-quote-start ((book goodreads-book))
   nil)
 
-(defmethod book-quote-text (goodreads-book)
+(defmethod book-quote-text ((book goodreads-book))
   nil)
 
-(defmethod book-rating (goodreads-book)
-  (nth 7 (slot-value goodreads-book 'data)))
+(defmethod book-rating ((book goodreads-book))
+  (nth 7 (slot-value book 'data)))
 
-(defmethod book-read (goodreads-book)
-  (let* ((count (nth 22 (slot-value goodreads-book 'data)))
+(defmethod book-read ((book goodreads-book))
+  (let* ((count (nth 22 (slot-value book 'data)))
          (intcount (cond ((typep count 'integer) count)
                          ((typep count 'string) (parse-integer count))
                          (t 0))))
     (> intcount 0)))
 
-(defmethod book-series (goodreads-book)
+(defmethod book-series ((book goodreads-book))
   (labels ((parse-one-series (series)
              (multiple-value-bind (match groups)
                  (ppcre:scan-to-strings "^([^,]+),? +#([\\d\.-]+)" series)
@@ -101,22 +101,22 @@
                      (list (list series))
                      (list (parse-one-series series)))
                  (mapcar (lambda (s) (parse-one-series s)) (ppcre:split "; " series)))))
-    (let* ((fulltitle (nth 1 (slot-value goodreads-book 'data))))
+    (let* ((fulltitle (nth 1 (slot-value book 'data))))
       (multiple-value-bind (match groups)
           (ppcre:scan-to-strings "\\((.*)\\)" fulltitle)
         (if match
             (parse-series (aref groups 0))
             nil)))))
 
-(defmethod book-subtitle (goodreads-book)
-  (let* ((fulltitle (nth 1 (slot-value goodreads-book 'data)))
+(defmethod book-subtitle ((book goodreads-book))
+  (let* ((fulltitle (nth 1 (slot-value book 'data)))
          (pos (search ": " fulltitle)))
     (if (null pos)
         ""
         (subseq fulltitle (+ pos 2)))))
 
-(defmethod book-title (goodreads-book)
-  (let* ((fulltitle (nth 1 (slot-value goodreads-book 'data)))
+(defmethod book-title ((book goodreads-book))
+  (let* ((fulltitle (nth 1 (slot-value book 'data)))
          (pos (search ": " fulltitle))
          (title (if (null pos)
                     fulltitle
