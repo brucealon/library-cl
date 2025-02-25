@@ -35,6 +35,7 @@
                             (format t "Adding book ~a to database.~%" (book-title book))
                             (add-publication :title (book-title book)
                                              :subtitle (book-subtitle book)
+                                             :owner user-id
                                              :private nil
                                              :inserter inserter-id)))))
     (first (first publications))))
@@ -48,6 +49,7 @@
                         (add-creator :first (book-creator-first book)
                                      :middle (book-creator-middle book)
                                      :last (book-creator-last book)
+                                     :owner user-id
                                      :private nil
                                      :inserter inserter-id)))))
     (first (first creators))))
@@ -62,7 +64,7 @@
   (let ((series (or (series-id-by-title :title series-title)
                     (progn
                       (format t "Adding series ~a to database.~%" series-title)
-                      (add-series :title series-title :private nil :inserter inserter-id)))))
+                      (add-series :title series-title :owner user-id :private nil :inserter inserter-id)))))
     (first (first series))))
 
 (defun get-or-link-series-entry (publication-id series-id series-number user-id inserter-id)
@@ -70,6 +72,7 @@
                             (add-series-entry :series series-id
                                               :publication publication-id
                                               :number series-number
+                                              :owner user-id
                                               :private nil
                                               :inserter inserter-id))))
     (first (first series-entries))))
@@ -89,6 +92,7 @@
                       (add-edition :publication publication-id
                                    :pages (book-pages book)
                                    :isbn (book-isbn book)
+                                   :owner user-id
                                    :private nil
                                    :inserter inserter-id))))
     (first (first editions))))
@@ -98,18 +102,19 @@
                       (add-edition-creator :edition edition-id
                                            :creator creator-id
                                            :role (get-or-insert-creator-role book inserter-id)
+                                           :owner user-id
                                            :private nil
                                            :inserter inserter-id))))
     (first (first editions))))
 
 (defun get-or-insert-read (book edition-id user-id inserter-id)
-  (let ((reads (or (user-publication-edition-read :edition edition-id :user user-id)
+  (let ((reads (or (user-publication-edition-read :edition edition-id :owner user-id)
                    (progn
                      (format t "Setting read date for ~a to '~a'~%" (book-title book) (book-date-read book))
                      (add-user-publication-edition-read :edition edition-id
-                                                        :user user-id
                                                         :read (book-date-read book)
                                                         :finished (book-read book)
+                                                        :owner user-id
                                                         :private nil
                                                         :inserter inserter-id)))))
     (first (first reads))))
@@ -119,18 +124,19 @@
                      (add-user-publication-review :read user-edition-read-id
                                                   :rating (book-rating book)
                                                   :review ""
+                                                  :owner user-id
                                                   :private nil
                                                   :inserter inserter-id))))
     (first (first reviews))))
 
 (defun get-or-insert-quote (book edition-id user-id inserter-id)
-  (let ((quotes (or (publication-edition-quote :edition edition-id :user user-id :page (book-quote-start book))
+  (let ((quotes (or (publication-edition-quote :edition edition-id :owner user-id :page (book-quote-start book))
                     (progn
                       (format t "Inserting quote for ~a on page ~a~%" (book-title book) (book-quote-start book))
                       (add-publication-edition-quote :edition edition-id
                                                      :quote (book-quote-text book)
                                                      :page (book-quote-start book)
-                                                     :user user-id
+                                                     :owner user-id
                                                      :private nil
                                                      :inserter inserter-id)))))
     (first (first quotes))))
@@ -141,6 +147,7 @@
                         (format t "Inserting comment for quote ~a~%" quote-id)
                         (add-user-quote-comment :quote quote-id
                                                 :comment (book-quote-comment book)
+                                                :owner user-id
                                                 :private nil
                                                 :inserter inserter-id)))))
     (first (first comments))))

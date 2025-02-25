@@ -30,8 +30,8 @@ select publication_id,
     and subtitle = :subtitle
 
 -- name: add-publication
-insert into publications (title, subtitle, private, inserted_by, inserted_at)
-  values (:title, :subtitle, :private, :inserter, now())
+insert into publications (title, subtitle, owned_by, private, inserted_by, inserted_at)
+  values (:title, :subtitle, :owner, :private, :inserter, now())
   returning publication_id
 
 -- name: creator-by-name
@@ -46,8 +46,8 @@ select c.creator_id,
     and c.last_name = :last
 
 -- name: add-creator
-insert into creators (first_name, middle_name, last_name, private, inserted_by, inserted_at)
-  values (:first, :middle, :last, :private, :inserter, now())
+insert into creators (first_name, middle_name, last_name, owned_by, private, inserted_by, inserted_at)
+  values (:first, :middle, :last, :owner, :private, :inserter, now())
   returning creator_id
 
 -- name: creator-role-by-name
@@ -66,8 +66,8 @@ select publication_series_id
    where title = :title
 
 -- name: add-series
-insert into publication_series (title, private, inserted_by, inserted_at)
-  values (:title, :private, :inserter, now())
+insert into publication_series (title, owned_by, private, inserted_by, inserted_at)
+  values (:title, :owner, :private, :inserter, now())
   returning publication_series_id
 
 -- name: series-entry
@@ -80,10 +80,11 @@ select publication_series_entry_id
 insert into publication_series_entries (publication_id,
                                         publication_series_id,
                                         series_number,
+                                        owned_by,
                                         private,
                                         inserted_by,
                                         inserted_at)
-  values (:publication, :series, :number, :private, :inserter, now())
+  values (:publication, :series, :number, :owner, :private, :inserter, now())
   returning publication_series_entry_id
 
 -- name: series-entries
@@ -100,8 +101,8 @@ select publication_edition_id
   where publication_id = :publication
 
 -- name: add-edition
-insert into publication_editions (publication_id, pages, isbn, private, inserted_by, inserted_at)
-  values (:publication, :pages, :isbn, :private, :inserter, now())
+insert into publication_editions (publication_id, pages, isbn, owned_by, private, inserted_by, inserted_at)
+  values (:publication, :pages, :isbn, :owner, :private, :inserter, now())
   returning publication_edition_id
 
 -- name: edition-creator-by-id
@@ -110,19 +111,31 @@ select publication_edition_creator_id
   where publication_edition_id = :edition
 
 -- name: add-edition-creator
-insert into publication_edition_creators (publication_edition_id, creator_id, creator_role_id, private, inserted_by, inserted_at)
-  values (:edition, :creator, :role, :private, :inserter, now())
+insert into publication_edition_creators (publication_edition_id,
+                                          creator_id,
+                                          creator_role_id,
+                                          owned_by,
+                                          private,
+                                          inserted_by,
+                                          inserted_at)
+  values (:edition, :creator, :role, :owner, :private, :inserter, now())
   returning publication_edition_creator_id
 
 -- name: user-publication-edition-read
 select user_publication_edition_read_id
   from user_publication_edition_reads
   where publication_edition_id = :edition
-    and user_id = :user
+    and owned_by = :owner
 
 -- name: add-user-publication-edition-read
-insert into user_publication_edition_reads (publication_edition_id, user_id, read, finished, private, inserted_by, inserted_at)
-  values (:edition, :user, :read, :finished, :private, :inserter, now())
+insert into user_publication_edition_reads (publication_edition_id,
+                                            read,
+                                            finished,
+                                            owned_by,
+                                            private,
+                                            inserted_by,
+                                            inserted_at)
+  values (:edition, :read, :finished, :owner, :private, :inserter, now())
   returning user_publication_edition_read_id
 
 -- name: user-publication-review
@@ -133,20 +146,26 @@ select user_publication_review_id,
   where user_publication_edition_read_id = :read
 
 -- name: add-user-publication-review
-insert into user_publication_reviews (user_publication_edition_read_id, stars, review, private, inserted_by, inserted_at)
-  values (:read, :rating, :review, :private, :inserter, now())
+insert into user_publication_reviews (user_publication_edition_read_id,
+                                      stars,
+                                      review,
+                                      owned_by,
+                                      private,
+                                      inserted_by,
+                                      inserted_at)
+  values (:read, :rating, :review, :owner, :private, :inserter, now())
   returning user_publication_review_id
 
 -- name: publication-edition-quote
 select user_quote_id
   from user_quotes
   where publication_edition_id = :edition
-    and user_id = :user
+    and owned_by = :owner
     and page = :page
 
 -- name: add-publication-edition-quote
-insert into user_quotes (publication_edition_id, quote, page, user_id, private, inserted_by, inserted_at)
-  values (:edition, :quote, :page, :user, :private, :inserter, now())
+insert into user_quotes (publication_edition_id, quote, page, owned_by, private, inserted_by, inserted_at)
+  values (:edition, :quote, :page, :owner, :private, :inserter, now())
   returning user_quote_id
 
 -- name: user-quote-comment
@@ -155,6 +174,6 @@ select user_quote_comment_id
   where user_quote_id = :quote
 
 -- name: add-user-quote-comment
-insert into user_quote_comments (user_quote_id, comment, private, inserted_by, inserted_at)
-  values (:quote, :comment, :private, :inserter, now())
+insert into user_quote_comments (user_quote_id, comment, owned_by, private, inserted_by, inserted_at)
+  values (:quote, :comment, :owner, :private, :inserter, now())
   returning user_quote_comment_id
