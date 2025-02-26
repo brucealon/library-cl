@@ -170,7 +170,7 @@
                 (get-or-insert-quote-comment book quote-id user-id inserter-id)))))))
 
 (defun import-books (books)
-  (with-connection (list *postgres-db* *postgres-user* *postgres-pass* *postgres-host*)
+  (with-connection (list *postgres-db* *postgres-user* *postgres-password* *postgres-host*)
     (let ((user-id (get-or-insert-user *user-email* *user-first* *user-last* *user-display* *user-admin*))
           (inserter-id (get-or-insert-user *inserter-email* *inserter-first* *inserter-last* *inserter-display* *inserter-admin*)))
       (loop for book being the elements of books do

@@ -12,14 +12,14 @@
   "hello app")
 
 (easy-routes:defroute route-publications ("/publications") ()
-  (with-connection (list *postgres-db* *postgres-user* *postgres-pass* *postgres-host* :pooled-p t)
+  (with-connection (list *postgres-db* *postgres-user* *postgres-password* *postgres-host* :pooled-p t)
     (with-output-to-string (out)
       (loop for publication being the elements of (all-publications) do
         (format out "Publication: ~a<br/>~%" (second publication)))
       out)))
 
 (easy-routes:defroute route-creators ("/creators") ()
-  (with-connection (list *postgres-db* *postgres-user* *postgres-pass* *postgres-host* :pooled-p t)
+  (with-connection (list *postgres-db* *postgres-user* *postgres-password* *postgres-host* :pooled-p t)
     (with-output-to-string (out)
       (loop for creator being the elements of (all-creators) do
         (format out "Creator: ~a ~a<br/>~%" (second creator) (third creator)))
