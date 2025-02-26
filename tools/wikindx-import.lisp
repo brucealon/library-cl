@@ -39,6 +39,7 @@
                     :database *mysql-db*
                     :user *mysql-user*
                     :password *mysql-password*)
+  (cl-mysql:query "set names 'utf8'")
   (let* ((result-set (cl-mysql:query *wikindx-query*))
          (books (first (first result-set))))
     (mapcar (lambda (row) (funcall 'new-wikindx row)) books)))
