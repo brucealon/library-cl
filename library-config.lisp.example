@@ -1,0 +1,26 @@
+
+(defparameter *postgres-user*     "user")
+(defparameter *postgres-password* "password")
+(defparameter *postgres-host*     "/var/run/postgresql/")
+(defparameter *postgres-db*       "library_cl")
+
+(defparameter *mysql-host*        "localhost")
+(defparameter *mysql-db*          "wikindx4")
+(defparameter *mysql-user*        "user")
+(defparameter *mysql-password*    "password")
+
+(defparameter *user-email*        "user@example.com")
+(defparameter *user-first*        "First")
+(defparameter *user-last*         "Last")
+(defparameter *user-display*      "flast")
+(defparameter *user-admin*        t)
+
+(defparameter *inserter-email*    "inserter@example.com")
+(defparameter *inserter-first*    "Insert")
+(defparameter *inserter-last*     "User")
+(defparameter *inserter-display*  "inserter")
+(defparameter *inserter-admin*    nil)
+
+(defparameter *project-dir*           #P"/home/user/git/library-cl/")
+(defparameter *goodreads-export-file* #P"/home/user/Downloads/goodreads_library_export.csv")
+
