@@ -1,0 +1,16 @@
+<html>
+  <head><title>Library - Publications</title></head>
+
+  <body>
+    <h1>Publications</h1>
+    <ul>
+      {% for publication in publications %}
+      <li> {% if publication.2 %}
+        <a href="/publications/{{ publication.0 }}">{{ publication.1 }}</a>: {{ publication.2 }}
+        {% else %}
+        <a href="/publications/{{ publication.0 }}">{{ publication.1 }}</a>
+        {% endif %} </li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

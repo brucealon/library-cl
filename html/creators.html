@@ -1,0 +1,12 @@
+<html>
+  <head><title>Library - Creators</title></head>
+
+  <body>
+    <h1>Creators</h1>
+    <ul>
+      {% for creator in creators %}
+      <li><a href="/creators/{{ creator.0 }}">{{ creator.1 }} {{ creator.2 }}</a></li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
