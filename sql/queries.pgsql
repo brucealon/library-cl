@@ -21,6 +21,18 @@ select creator_id,
        last_name
   from creators
 
+-- name: creator-by-id
+select first_name,
+       last_name
+  from creators
+  where creator_id = :id
+
+-- name: publication-by-id
+select title,
+       subtitle
+  from publications
+  where publication_id = :id
+
 -- name: publication-by-title
 select publication_id,
        title,
