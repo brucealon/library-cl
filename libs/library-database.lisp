@@ -12,6 +12,10 @@
   :as :cl-yesql/postmodern
   :binding :all-functions)
 
+(defmacro with-library-db (&body body)
+  `(with-connection (list *postgres-db* *postgres-user* *postgres-password* *postgres-host* :pooled-p t)
+     ,@body))
+
 (defun get-or-insert-user (email first-name last-name display-name admin)
   (let ((users (or (user-id :email email)
                    (progn
