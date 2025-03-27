@@ -28,14 +28,19 @@
     (first (first users))))
 
 (defun get-user (username)
-  (let ((users (user-by-username :username username)))
-    (first users)))
+  (first (user-by-username :username username)))
 
-(defun all-publications ()
-  (publications))
+(defun all-publications (owner)
+  (publications :owner owner))
 
-(defun all-creators ()
-  (creators))
+(defun all-creators (owner)
+  (creators :owner owner))
+
+(defun get-publication-by-id (publication-id owner)
+  (first (publication-by-id :id publication-id :owner owner)))
+
+(defun get-creator-by-id (creator-id owner)
+  (first (creator-by-id :id creator-id :owner owner)))
 
 (defun get-or-insert-publication (book user-id inserter-id)
   (let ((publications (or (publication-by-title :title (book-title book) :subtitle (book-subtitle book))

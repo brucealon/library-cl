@@ -12,6 +12,8 @@
 (defparameter *server* nil)
 (defparameter *server-port* 4242)
 
+(djula:add-template-directory (merge-pathnames "html/" *project-dir*))
+
 (defun log-info (&rest messages)
   (print (apply 'concatenate `(string ,@messages))))
 
@@ -31,16 +33,34 @@
          (string= username (user-username user))
          (ironclad:pbkdf2-check-password (babel:string-to-octets password) (user-hashed-password user)))))
 
-(defun logged-in-p ()
-  (log-info "Checking session username: '" (session-username) "'")
-  (session-username))
+(defun owner-id ()
+  (let ((username (session-username)))
+    (if username
+        (user-id (with-library-db (get-user username)))
+        -1)))
 
-(djula:add-template-directory (merge-pathnames "html/" *project-dir*))
+(defun logged-in-p (&optional (page "unknown"))
+  (let ((username (session-username)))
+    (log-info "Have session username '" username "' for page " page)
+    username))
 
-(easy-routes:defroute root ("/") ()
-  (if (logged-in-p)
-      (djula:render-template* (djula:compile-template* "library.html"))
-      (djula:render-template* (djula:compile-template* "login.html"))))
+(defmacro render-template (file &rest rest)
+  `(progn
+     (log-info "Rendering template for " ,file)
+     (djula:render-template* (djula:compile-template* ,file)
+                             nil
+                             ,@rest)))
+
+(defmacro render-logged-in-template (file &rest rest)
+  `(if (logged-in-p ,file)
+       (render-template ,file ,@rest)
+       (render-template "login.html")))
+
+(defmacro render-logged-in-db-template (file &rest rest)
+  `(if (logged-in-p ,file)
+       (with-library-db
+         (render-template ,file ,@rest))
+       (render-template "login.html")))
 
 (easy-routes:defroute route-login ("/login" :method :post) (username password)
   (log-info "Logging in as '" username "'")
@@ -50,9 +70,7 @@
      (setf (hunchentoot:session-value 'username) username)
      (hunchentoot:redirect "/"))
     (t
-     (djula:render-template* (djula:compile-template* "login.html")
-                             nil
-                             :username username :error t))))
+     (render-template "login.html" :username username :error t))))
 
 (easy-routes:defroute route-logout ("/logout") ()
   (if (logged-in-p)
@@ -61,29 +79,28 @@
         (hunchentoot:remove-session hunchentoot:*session*)))
   (hunchentoot:redirect "/"))
 
+(easy-routes:defroute root ("/") ()
+  (render-logged-in-template "library.html"))
+
 (easy-routes:defroute route-publications ("/publications") ()
-  (with-library-db
-    (djula:render-template* (djula:compile-template* "publications.html")
-                            nil
-                            :publications (all-publications))))
+  (render-logged-in-db-template
+   "publications.html"
+   :publications (all-publications (owner-id))))
 
 (easy-routes:defroute route-publication ("/publications/:publication") ()
-  (with-library-db
-    (djula:render-template* (djula:compile-template* "publication.html")
-                            nil
-                            :publication (first (publication-by-id :id publication)))))
+  (render-logged-in-db-template
+   "publication.html"
+   :publication (get-publication-by-id publication (owner-id))))
 
 (easy-routes:defroute route-creators ("/creators") ()
-  (with-library-db
-    (djula:render-template* (djula:compile-template* "creators.html")
-                            nil
-                            :creators (all-creators))))
+  (render-logged-in-db-template
+   "creators.html"
+   :creators (all-creators (owner-id))))
 
 (easy-routes:defroute route-creator ("/creators/:creator") ()
-  (with-library-db
-    (djula:render-template* (djula:compile-template* "creator.html")
-                            nil
-                            :creator (first (creator-by-id :id creator)))))
+  (render-logged-in-db-template
+   "creator.html"
+   :creator (get-creator-by-id creator (owner-id))))
 
 (if (not (null *server*))
     (format nil "Need to stop the current server first?")

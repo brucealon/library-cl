@@ -27,24 +27,32 @@ select publication_id,
        title,
        subtitle
   from publications
+  where private = FALSE
+    or owned_by = :owner
 
 -- name: creators
 select creator_id,
        first_name,
        last_name
   from creators
+  where private = FALSE
+    or owned_by = :owner
 
 -- name: creator-by-id
 select first_name,
        last_name
   from creators
   where creator_id = :id
+    and (private = FALSE
+         or owned_by = :owner)
 
 -- name: publication-by-id
 select title,
        subtitle
   from publications
   where publication_id = :id
+    and (private = FALSE
+         or owned_by = :owner)
 
 -- name: publication-by-title
 select publication_id,
