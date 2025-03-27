@@ -27,6 +27,10 @@
                                :admin admin)))))
     (first (first users))))
 
+(defun get-user (username)
+  (let ((users (user-by-username :username username)))
+    (first users)))
+
 (defun all-publications ()
   (publications))
 

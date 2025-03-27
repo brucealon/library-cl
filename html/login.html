@@ -1,0 +1,30 @@
+<html>
+  <head><title>Library</title></head>
+
+  <body>
+    <h1>This is the library</h1>
+
+    {% if error %}
+    <p style="color: red;">Bad username or password</p>
+    {% endif %}
+
+    <p>Please log in</p>
+    <form method=post action="/login">
+      <div>
+        Username:
+        {% if username %}
+        <input type="text" name="username" value="{{ username }}" />
+        {% else %}
+        <input type="text" name="username" />
+        {% endif %}
+      </div>
+      <div>
+        Password:
+        <input type="password" name="password" />
+      </div>
+      <div>
+        <input type="submit" value="Log In" />
+      </div>
+    </form>
+  </body>
+</html>

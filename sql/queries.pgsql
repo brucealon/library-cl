@@ -9,6 +9,19 @@ insert into library_users (email, first_name, last_name, display_name, joined, a
   values (:email, :first, :last, :display, now(), :admin)
   returning library_user_id
 
+-- name: user-by-username
+select library_user_id as id,
+       email,
+       first_name,
+       last_name,
+       display_name as username,
+       joined,
+       last_login,
+       admin,
+       hashed_password
+  from library_users
+  where display_name = :username
+
 -- name: publications
 select publication_id,
        title,

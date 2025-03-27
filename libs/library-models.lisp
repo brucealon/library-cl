@@ -33,3 +33,30 @@ so ((\"Elvis Cole\" 7) (\"Joe Pike\" 2))."))
 (defgeneric book-subtitle (book))
 
 (defgeneric book-title (book))
+
+(defun user-id (user)
+  (nth 0 user))
+
+(defun user-email (user)
+  (nth 1 user))
+
+(defun user-first-name (user)
+  (nth 2 user))
+
+(defun user-last-name (user)
+  (nth 3 user))
+
+(defun user-username (user)
+  (nth 4 user))
+
+(defun user-joined (user)
+  (nth 5 user))
+
+(defun user-last-login (user)
+  (nth 6 user))
+
+(defun user-admin-p (user)
+  (nth 7 user))
+
+(defun user-hashed-password (user)
+  (nth 8 user))
