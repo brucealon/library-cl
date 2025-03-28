@@ -24,7 +24,8 @@
           rq.resourcequotePageStart as quote_start,
           rq.resourcequotePageEnd as quote_end,
           rqt.resourcequotetextText as quote,
-          rqc.resourcequotecommentComment as quote_comment
+          rqc.resourcequotecommentComment as quote_comment,
+          r.resourceNoSort as nosort
      from WKX_resource r
        inner join WKX_resource_misc m on r.resourceId = m.resourcemiscId
        left outer join WKX_resource_creator rc on rc.resourcecreatorResourceId = r.resourceId

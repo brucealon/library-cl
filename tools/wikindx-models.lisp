@@ -65,4 +65,8 @@
   (nth 4 (slot-value book 'data)))
 
 (defmethod book-title ((book wikindx-book))
-  (nth 3 (slot-value book 'data)))
+  (let ((title (nth 3 (slot-value book 'data)))
+        (nosort (nth 20 (slot-value book 'data))))
+    (if nosort
+        (concatenate 'string nosort " " title)
+        title)))

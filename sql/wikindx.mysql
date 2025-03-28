@@ -38,7 +38,8 @@ select r.resourceId as id,
        rq.resourcequotePageStart as quote_start,
        rq.resourcequotePageEnd as quote_end,
        rqt.resourcequotetextText as quote,
-       rqc.resourcequotecommentComment as quote_comment
+       rqc.resourcequotecommentComment as quote_comment,
+       r.resourceNoSort as nosort
   from WKX_resource r
     inner join WKX_resource_misc m on r.resourceId = m.resourcemiscId
     left outer join WKX_resource_creator rc on rc.resourcecreatorResourceId = r.resourceId
@@ -47,7 +48,7 @@ select r.resourceId as id,
     left outer join WKX_resource_quote rq on rq.resourcequoteResourceId = r.resourceId
     left outer join WKX_resource_quote_comment rqc on rqc.resourcequotecommentQuoteId = rq.resourcequoteId
     left outer join WKX_resource_quote_text rqt on rqt.resourcequotetextId = rq.resourcequoteId
-  where r.resourceTitle = 'Blood of Elves';
+  where r.resourceTitle = 'Age of Magical Overthinking';
 
 select r.resourceTitle as title,
        m.resourcemiscCollection as collection,
