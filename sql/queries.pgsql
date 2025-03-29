@@ -1,5 +1,5 @@
 
--- name: user-id
+-- name: user-id-by-email
 select library_user_id
   from library_users
   where email = :email

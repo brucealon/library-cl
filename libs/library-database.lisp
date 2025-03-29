@@ -17,7 +17,7 @@
      ,@body))
 
 (defun get-or-insert-user (email first-name last-name display-name admin)
-  (let ((users (or (user-id :email email)
+  (let ((users (or (user-id-by-email :email email)
                    (progn
                      (format t "Adding user ~a~%" display-name)
                      (add-user :email email
