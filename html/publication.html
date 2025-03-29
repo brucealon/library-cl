@@ -8,5 +8,16 @@
 
     <h1>{{ publication.0 }}</h1>
     <p>{{ publication.1 }}</p>
+
+    {% if quotes %}
+    <div>Quotes:</div>
+    <ul>
+      {% for quote in quotes %}
+      <li style="list-style-type: none;">
+        {{ quote.1 }}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
   </body>
 </html>

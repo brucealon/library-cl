@@ -8,11 +8,17 @@
     <h1>Publications</h1>
     <ul>
       {% for publication in publications %}
-      <li> {% if publication.2 %}
-        <a href="/publications/{{ publication.0 }}">{{ publication.1 }}</a>: {{ publication.2 }}
+      <li style="list-style-type: none;">
+        {% if publication.6 > 0 %}
+        *
+        {% endif %}
+        {% if publication.2 %}
+        <a href="/publications/{{ publication.0 }}">{{ publication.1 }}</a>: {{ publication.2 }},
         {% else %}
-        <a href="/publications/{{ publication.0 }}">{{ publication.1 }}</a>
-        {% endif %} </li>
+        <a href="/publications/{{ publication.0 }}">{{ publication.1 }}</a>,
+        {% endif %}
+         by <a href="/creators/{{ publication.3 }}">{{ publication.4 }} {{ publication.5 }}</a>
+      </li>
       {% endfor %}
     </ul>
   </body>

@@ -23,12 +23,35 @@ select library_user_id as id,
   where display_name = :username
 
 -- name: publications
-select publication_id,
-       title,
-       subtitle
-  from publications
-  where private = FALSE
-    or owned_by = :owner
+select p.publication_id,
+       p.title,
+       p.subtitle,
+       c.creator_id,
+       c.first_name,
+       c.last_name,
+       (select count(*)
+          from user_quotes uq
+            inner join publication_editions pe on uq.publication_edition_id = pe.publication_edition_id
+          where pe.publication_id = p.publication_id) as number_quotes
+  from publications p
+    left outer join publication_editions pe on p.publication_id = pe.publication_id
+    left outer join publication_edition_creators pec on pe.publication_edition_id = pec.publication_edition_id
+    left outer join creators c on pec.creator_id = c.creator_id
+    left outer join creator_roles cr on pec.creator_role_id = cr.creator_role_id
+  where p.private = false
+    or p.owned_by = :owner
+
+-- name: quotes-for-publication
+select uq.user_quote_id,
+       uq.quote,
+       uq.page,
+       uq.chapter,
+       uq.section
+  from user_quotes uq
+    inner join publication_editions pe on uq.publication_edition_id = pe.publication_edition_id
+  where pe.publication_id = :publication
+    and (uq.private = false or uq.owned_by = :owner)
+    and (pe.private = false or pe.owned_by = :owner)
 
 -- name: creators
 select creator_id,

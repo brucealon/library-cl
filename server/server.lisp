@@ -81,7 +81,8 @@
 (easy-routes:defroute route-publication ("/publications/:publication") ()
   (render-logged-in-db-template
    "publication.html"
-   :publication (get-publication-by-id publication (owner-id))))
+   :publication (get-publication-by-id publication (owner-id))
+   :quotes (get-quotes-for-publication publication (owner-id))))
 
 (easy-routes:defroute route-creators ("/creators") ()
   (render-logged-in-db-template
