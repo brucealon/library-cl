@@ -21,12 +21,13 @@
    (boundp 'hunchentoot:*session*)
    (hunchentoot:session-value 'username)))
 
+(defun session-userid ()
+  (and
+   (boundp 'hunchentoot:*session*)
+   (hunchentoot:session-value 'userid)))
 
 (defun owner-id ()
-  (let ((username (session-username)))
-    (if username
-        (user-id (with-library-db (get-user username)))
-        -1)))
+  (session-userid))
 
 (defun logged-in-p (&optional (page "unknown"))
   (let ((username (session-username)))
@@ -57,6 +58,7 @@
     ((valid-user-p username password)
      (hunchentoot:start-session)
      (setf (hunchentoot:session-value 'username) username)
+     (setf (hunchentoot:session-value 'userid) (user-id (with-library-db (get-user username))))
      (hunchentoot:redirect "/"))
     (t
      (render-template "login.html" :username username :error t))))
