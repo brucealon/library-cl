@@ -11,6 +11,7 @@
 (defparameter *server-port* 4242)
 
 (djula:add-template-directory (merge-pathnames "html/" *project-dir*))
+(setf (getf djula:*default-template-arguments* :app_title) "Library")
 
 (defun log-info (&rest messages)
   (print (apply 'concatenate `(string ,@messages))))
