@@ -62,7 +62,10 @@
                   (nth 7 (slot-value book 'data))))))
 
 (defmethod book-subtitle ((book wikindx-book))
-  (nth 4 (slot-value book 'data)))
+  (let ((subtitle (nth 4 (slot-value book 'data))))
+    (if (equal "false" subtitle)
+        ""
+        subtitle)))
 
 (defmethod book-title ((book wikindx-book))
   (let ((title (nth 3 (slot-value book 'data)))
