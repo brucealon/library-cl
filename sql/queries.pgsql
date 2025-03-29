@@ -5,8 +5,8 @@ select library_user_id
   where email = :email
 
 -- name: add-user
-insert into library_users (email, first_name, last_name, display_name, joined, admin)
-  values (:email, :first, :last, :display, now(), :admin)
+insert into library_users (email, first_name, last_name, display_name, joined, admin, hashed_password)
+  values (:email, :first, :last, :display, now(), :admin, :password)
   returning library_user_id
 
 -- name: user-by-username

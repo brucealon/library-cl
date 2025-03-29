@@ -1,9 +1,7 @@
 
-(ql:quickload :babel)
 (ql:quickload :djula)
 (ql:quickload :easy-routes)
 (ql:quickload :hunchentoot)
-(ql:quickload :ironclad)
 
 (load (merge-pathnames ".library-config.lisp" (user-homedir-pathname)))
 (load (merge-pathnames "libs/library-database.lisp" *project-dir*))
@@ -22,16 +20,6 @@
    (boundp 'hunchentoot:*session*)
    (hunchentoot:session-value 'username)))
 
-(defun hash-password (password)
-  (ironclad:pbkdf2-hash-password-to-combined-string (babel:string-to-octets password)))
-
-(defun valid-user-p (username password)
-  (let ((user (with-library-db (get-user username))))
-    (and user
-         (user-hashed-password user)
-         (not (eq :null (user-hashed-password user)))
-         (string= username (user-username user))
-         (ironclad:pbkdf2-check-password (babel:string-to-octets password) (user-hashed-password user)))))
 
 (defun owner-id ()
   (let ((username (session-username)))

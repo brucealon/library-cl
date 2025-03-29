@@ -1,8 +1,10 @@
 
 (load (merge-pathnames ".library-config.lisp" (user-homedir-pathname)))
 
+(ql:quickload :babel)
 (ql:quickload "cl-yesql")
 (ql:quickload "cl-yesql/postmodern")
+(ql:quickload :ironclad)
 
 (use-package :postmodern)
 
@@ -16,7 +18,18 @@
   `(with-connection (list *postgres-db* *postgres-user* *postgres-password* *postgres-host* :pooled-p t)
      ,@body))
 
-(defun get-or-insert-user (email first-name last-name display-name admin)
+(defun hash-password (password)
+  (ironclad:pbkdf2-hash-password-to-combined-string (babel:string-to-octets password)))
+
+(defun valid-user-p (username password)
+  (let ((user (with-library-db (get-user username))))
+    (and user
+         (user-hashed-password user)
+         (not (eq :null (user-hashed-password user)))
+         (string= username (user-username user))
+         (ironclad:pbkdf2-check-password (babel:string-to-octets password) (user-hashed-password user)))))
+
+(defun get-or-insert-user (email first-name last-name display-name admin password)
   (let ((users (or (user-id-by-email :email email)
                    (progn
                      (format t "Adding user ~a~%" display-name)
@@ -24,7 +37,8 @@
                                :first first-name
                                :last last-name
                                :display display-name
-                               :admin admin)))))
+                               :admin admin
+                               :password (hash-password password))))))
     (first (first users))))
 
 (defun get-user (username)
@@ -184,7 +198,7 @@
 
 (defun import-books (books)
   (with-connection (list *postgres-db* *postgres-user* *postgres-password* *postgres-host*)
-    (let ((user-id (get-or-insert-user *user-email* *user-first* *user-last* *user-display* *user-admin*))
-          (inserter-id (get-or-insert-user *inserter-email* *inserter-first* *inserter-last* *inserter-display* *inserter-admin*)))
+    (let ((user-id (get-or-insert-user *user-email* *user-first* *user-last* *user-display* *user-admin* *user-password*))
+          (inserter-id (get-or-insert-user *inserter-email* *inserter-first* *inserter-last* *inserter-display* *inserter-admin* *inserter-password*)))
       (loop for book being the elements of books do
         (import-book book user-id inserter-id)))))

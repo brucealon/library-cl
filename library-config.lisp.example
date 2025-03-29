@@ -14,12 +14,14 @@
 (defparameter *user-last*         "Last")
 (defparameter *user-display*      "flast")
 (defparameter *user-admin*        t)
+(defparameter *user-password*     "plaintext") ;; will be hashed on insert
 
 (defparameter *inserter-email*    "inserter@example.com")
 (defparameter *inserter-first*    "Insert")
 (defparameter *inserter-last*     "User")
 (defparameter *inserter-display*  "inserter")
 (defparameter *inserter-admin*    nil)
+(defparameter *inserter-password* "plaintext") ;; will be hashed on insert
 
 (defparameter *project-dir*           #P"/home/user/git/library-cl/")
 (defparameter *goodreads-export-file* #P"/home/user/Downloads/goodreads_library_export.csv")
